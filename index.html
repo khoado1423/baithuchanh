@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Task Scheduler - Dashboard</title>
+    <title>Employee Task Scheduler</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
@@ -18,18 +18,12 @@
         .sidebar { background-color: var(--sidebar-bg); min-height: 100vh; color: white; }
         .sidebar .nav-link { color: #a0aec0; font-weight: 500; margin-bottom: 5px; border-radius: 8px; padding: 10px 15px; cursor: pointer; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { color: white; background-color: var(--sidebar-active); }
-        .stat-card { border: none; border-radius: 12px; transition: transform 0.2s; }
+        .stat-card { border: none; border-radius: 12px; }
         .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         .bg-icon-primary { background-color: #e8f0fe; color: #1d61e7; }
         .bg-icon-success { background-color: #e6f4ea; color: #137333; }
         .bg-icon-warning { background-color: #fef7e0; color: #b06000; }
         .bg-icon-purple { background-color: #f3e8fd; color: #7a0bc0; }
-        .shift-badge { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; }
-        .shift-morning { background-color: #e3f2fd; color: #0d6efd; }
-        .shift-afternoon { background-color: #e8f5e9; color: #198754; }
-        .table-schedule th, .table-schedule td { text-align: center; vertical-align: middle; font-size: 0.85rem; }
-        
-        /* Utility cho SPA Tab Switch */
         .tab-content-page { display: none; }
         .tab-content-page.active { display: block; }
     </style>
@@ -74,9 +68,6 @@
                 <div class="d-flex align-items-center gap-3 text-muted small">
                     <span><i class="fa-regular fa-clock me-1"></i> 09:15:30 AM</span>
                     <span><i class="fa-regular fa-calendar me-1"></i> Thứ hai, 19/05/2025</span>
-                    <i class="fa-regular fa-bell fs-5 text-dark position-relative">
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                    </i>
                 </div>
             </div>
 
@@ -88,180 +79,128 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <div class="text-muted small">Tổng nhân viên</div>
-                                    <div class="fs-3 fw-bold">25</div>
-                                    <div class="text-success small" style="font-size:0.75rem;">+ 2 so với tuần trước</div>
+                                    <div class="fs-3 fw-bold" id="dash-emp-count">0</div>
                                 </div>
                                 <div class="stat-icon bg-icon-primary"><i class="fa-solid fa-users"></i></div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card p-3 shadow-sm">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="text-muted small">Tổng công việc</div>
-                                    <div class="fs-3 fw-bold">18</div>
-                                    <div class="text-success small" style="font-size:0.75rem;">+ 3 so với tuần trước</div>
-                                </div>
-                                <div class="stat-icon bg-icon-success"><i class="fa-solid fa-clipboard-check"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card p-3 shadow-sm">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="text-muted small">Tổng lịch phân công</div>
-                                    <div class="fs-3 fw-bold">62</div>
-                                    <div class="text-success small" style="font-size:0.75rem;">+ 8 so với tuần trước</div>
-                                </div>
-                                <div class="stat-icon bg-icon-warning"><i class="fa-solid fa-calendar-days"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card p-3 shadow-sm">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="text-muted small">Hôm nay làm việc</div>
-                                    <div class="fs-3 fw-bold">12</div>
-                                    <a href="#" class="text-primary text-decoration-none small" style="font-size:0.75rem;">Chi tiết &rarr;</a>
-                                </div>
-                                <div class="stat-icon bg-icon-purple"><i class="fa-solid fa-user-check"></i></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- Dashboard Content Grid -->
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <div class="card border-0 shadow-sm p-3 mb-3">
-                            <h6 class="fw-bold mb-3"><i class="fa-solid fa-calendar-plus text-primary me-2"></i>Phân công nhanh</h6>
-                            <form>
-                                <div class="mb-2">
-                                    <label class="form-label small text-muted">Nhân viên</label>
-                                    <select class="form-select form-select-sm"><option>-- Chọn nhân viên --</option></select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small text-muted">Công việc</label>
-                                    <select class="form-select form-select-sm"><option>-- Chọn công việc --</option></select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small text-muted">Ngày làm việc</label>
-                                    <input type="date" class="form-control form-select-sm" value="2025-05-19">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label small text-muted">Ca làm việc</label>
-                                    <div class="form-check small"><input class="form-check-input" type="radio" name="ca" checked> <label class="form-check-label">Ca sáng (07:30 - 11:30)</label></div>
-                                    <div class="form-check small"><input class="form-check-input" type="radio" name="ca"> <label class="form-check-label">Ca chiều (13:00 - 17:00)</label></div>
-                                </div>
-                                <button type="button" class="btn btn-primary w-100 btn-sm"><i class="fa-solid fa-floppy-disk me-1"></i> Lưu phân công</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="col-md-9">
-                        <div class="card border-0 shadow-sm p-3">
-                            <h6 class="fw-bold mb-3"><i class="fa-regular fa-calendar-days text-primary me-2"></i>Tổng quan lịch tuần</h6>
-                            <p class="text-muted small">Nội dung xem nhanh lịch biểu làm việc tuần này.</p>
-                        </div>
-                    </div>
+                <div class="card border-0 shadow-sm p-3">
+                    <h6>Chào mừng quay trở lại hệ thống quản lý!</h6>
                 </div>
             </div>
 
-            <!-- TAB 2: NHÂN VIÊN -->
+            <!-- TAB 2: QUẢN LÝ NHÂN VIÊN -->
             <div class="tab-content-page" id="tab-employees">
                 <div class="card border-0 shadow-sm p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-bold mb-0">Danh sách nhân viên</h6>
-                        <button class="btn btn-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Thêm nhân viên</button>
+                    <!-- Thanh công cụ: Tìm kiếm, Lọc và Thêm -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div class="d-flex gap-2">
+                            <input type="text" id="search-emp" class="form-control form-control-sm" placeholder="Tìm theo tên hoặc SĐT..." onkeyup="filterEmployees()" style="width: 220px;">
+                            <select id="filter-dept" class="form-select form-select-sm" onchange="filterEmployees()" style="width: 160px;">
+                                <option value="">Tất cả phòng ban</option>
+                                <option value="Kỹ thuật">Kỹ thuật</option>
+                                <option value="Kinh doanh">Kinh doanh</option>
+                                <option value="Hành chính">Hành chính</option>
+                                <option value="Thiết kế">Thiết kế</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openEmpModal()"><i class="fa-solid fa-plus me-1"></i> Thêm nhân viên mới</button>
                     </div>
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Họ và Tên</th>
-                                <th>Chức vụ</th>
-                                <th>Phòng ban</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Nguyễn Văn A</td>
-                                <td>Kỹ sư</td>
-                                <td>Kỹ thuật</td>
-                                <td><span class="badge bg-success">Hoạt động</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Trần Thị B</td>
-                                <td>Chuyên viên</td>
-                                <td>Kinh doanh</td>
-                                <td><span class="badge bg-success">Hoạt động</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                    <!-- Bảng danh sách nhân viên -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Họ và Tên</th>
+                                    <th>Chức vụ</th>
+                                    <th>Phòng ban</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-center">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employee-table-body">
+                                <!-- JS Render dữ liệu tại đây -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- TAB 3: CÔNG VIỆC -->
-            <div class="tab-content-page" id="tab-tasks">
-                <div class="card border-0 shadow-sm p-3">
-                    <h6 class="fw-bold mb-3">Quản lý danh mục công việc</h6>
-                    <p class="text-muted small">Khu vực quản lý các đầu việc cần phân công.</p>
-                </div>
-            </div>
-
-            <!-- TAB 4: PHÂN CÔNG -->
-            <div class="tab-content-page" id="tab-assignment">
-                <div class="card border-0 shadow-sm p-3">
-                    <h6 class="fw-bold mb-3">Tạo phân công chi tiết</h6>
-                    <p class="text-muted small">Form phân công công việc chuyên sâu cho nhân viên.</p>
-                </div>
-            </div>
-
-            <!-- TAB 5: LỊCH TUẦN -->
-            <div class="tab-content-page" id="tab-schedule">
-                <div class="card border-0 shadow-sm p-3">
-                    <h6 class="fw-bold mb-3">Xem lịch biểu tuần</h6>
-                    <p class="text-muted small">Bảng theo dõi tiến độ và lịch trình dạng lịch làm việc.</p>
-                </div>
-            </div>
-
-            <!-- TAB 6: BÁO CÁO -->
-            <div class="tab-content-page" id="tab-reports">
-                <div class="card border-0 shadow-sm p-3">
-                    <h6 class="fw-bold mb-3">Báo cáo & Thống kê</h6>
-                    <p class="text-muted small">Thống kê giờ làm, số lượng công việc đã hoàn thành.</p>
-                </div>
-            </div>
-
-            <!-- TAB 7: CÀI ĐẶT -->
-            <div class="tab-content-page" id="tab-settings">
-                <div class="card border-0 shadow-sm p-3">
-                    <h6 class="fw-bold mb-3">Cài đặt hệ thống</h6>
-                    <p class="text-muted small">Cấu hình thời gian ca làm việc, phân quyền người dùng.</p>
-                </div>
-            </div>
+            <!-- Các Tab tiếp theo (Giữ khung) -->
+            <div class="tab-content-page" id="tab-tasks"><div class="card p-3"><h5>Tab Danh mục Công việc (Bước tiếp theo)</h5></div></div>
+            <div class="tab-content-page" id="tab-assignment"><div class="card p-3"><h5>Tab Phân công</h5></div></div>
+            <div class="tab-content-page" id="tab-schedule"><div class="card p-3"><h5>Tab Lịch tuần</h5></div></div>
+            <div class="tab-content-page" id="tab-reports"><div class="card p-3"><h5>Tab Báo cáo</h5></div></div>
+            <div class="tab-content-page" id="tab-settings"><div class="card p-3"><h5>Tab Cài đặt</h5></div></div>
 
         </div>
     </div>
 </div>
 
-<!-- JavaScript Điều Hướng Tab -->
+<!-- Modal Thêm/Sửa Nhân Viên -->
+<div class="modal fade" id="empModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="empModalTitle">Thêm nhân viên mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="empForm">
+                    <input type="hidden" id="emp-id">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Họ và Tên</label>
+                        <input type="text" class="form-control" id="emp-name" placeholder="Nhập tên nhân viên..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Chức vụ</label>
+                        <input type="text" class="form-control" id="emp-role" placeholder="Ví dụ: Kỹ sư, Chuyên viên..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Phòng ban</label>
+                        <select class="form-select" id="emp-dept" required>
+                            <option value="Kỹ thuật">Kỹ thuật</option>
+                            <option value="Kinh doanh">Kinh doanh</option>
+                            <option value="Hành chính">Hành chính</option>
+                            <option value="Thiết kế">Thiết kế</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Số điện thoại</label>
+                        <input type="text" class="form-control" id="emp-phone" placeholder="Nhập số điện thoại...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="saveEmployee()">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
+    // Dữ liệu Nhân viên mặc định (Tự động khởi tạo nếu chưa có)
+    let employees = JSON.parse(localStorage.getItem('app_employees')) || [
+        { id: 1, name: 'Nguyễn Văn A', role: 'Kỹ sư trưởng', dept: 'Kỹ thuật', phone: '0901234567' },
+        { id: 2, name: 'Trần Thị B', role: 'Chuyên viên Tư vấn', dept: 'Kinh doanh', phone: '0987654321' },
+        { id: 3, name: 'Lê Văn C', role: 'Kiến trúc sư', dept: 'Thiết kế', phone: '0911223344' }
+    ];
+
+    let empModalInstance;
+
     document.addEventListener('DOMContentLoaded', function () {
+        empModalInstance = new bootstrap.Modal(document.getElementById('empModal'));
+        
+        // Điều hướng Tab SPA
         const menuLinks = document.querySelectorAll('#main-menu .nav-link');
         const tabPages = document.querySelectorAll('.tab-content-page');
         const pageTitle = document.getElementById('page-title');
@@ -279,30 +218,124 @@
         menuLinks.forEach(link => {
             link.addEventListener('click', function (e) {
                 e.preventDefault();
-
-                // 1. Remove active class từ tất cả các nút
                 menuLinks.forEach(l => l.classList.remove('active'));
-                
-                // 2. Add active class vào nút vừa được click
                 this.classList.add('active');
-
-                // 3. Ẩn tất cả nội dung các tab
                 tabPages.forEach(page => page.classList.remove('active'));
 
-                // 4. Hiển thị tab tương ứng
                 const targetTab = this.getAttribute('data-tab');
-                const selectedPage = document.getElementById(`tab-${targetTab}`);
-                if (selectedPage) {
-                    selectedPage.classList.add('active');
-                }
-
-                // 5. Cập nhật Tiêu đề trang
-                if (titleMap[targetTab]) {
-                    pageTitle.textContent = titleMap[targetTab];
-                }
+                document.getElementById(`tab-${targetTab}`).classList.add('active');
+                if (titleMap[targetTab]) pageTitle.textContent = titleMap[targetTab];
             });
         });
+
+        renderEmployees(employees);
     });
+
+    // Render danh sách Nhân viên ra bảng
+    function renderEmployees(dataList) {
+        const tbody = document.getElementById('employee-table-body');
+        tbody.innerHTML = '';
+
+        if (dataList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">Không tìm thấy nhân viên nào</td></tr>`;
+            return;
+        }
+
+        dataList.forEach((emp, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td class="fw-bold text-primary">${emp.name}</td>
+                <td>${emp.role}</td>
+                <td><span class="badge bg-secondary">${emp.dept}</span></td>
+                <td>${emp.phone || '-'}</td>
+                <td><span class="badge bg-success">Hoạt động</span></td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee(${emp.id})" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${emp.id})" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Cập nhật con số lên Dashboard & Lưu dữ liệu vào trình duyệt
+        document.getElementById('dash-emp-count').textContent = employees.length;
+        localStorage.setItem('app_employees', JSON.stringify(employees));
+    }
+
+    // Lọc & Tìm kiếm nhân viên
+    function filterEmployees() {
+        const searchValue = document.getElementById('search-emp').value.toLowerCase();
+        const deptValue = document.getElementById('filter-dept').value;
+
+        const filtered = employees.filter(emp => {
+            const matchNameOrPhone = emp.name.toLowerCase().includes(searchValue) || emp.phone.includes(searchValue);
+            const matchDept = deptValue === '' || emp.dept === deptValue;
+            return matchNameOrPhone && matchDept;
+        });
+
+        renderEmployees(filtered);
+    }
+
+    // Mở Modal Thêm mới
+    function openEmpModal() {
+        document.getElementById('empModalTitle').textContent = 'Thêm nhân viên mới';
+        document.getElementById('empForm').reset();
+        document.getElementById('emp-id').value = '';
+        empModalInstance.show();
+    }
+
+    // Mở Modal Chỉnh sửa
+    function editEmployee(id) {
+        const emp = employees.find(e => e.id === id);
+        if (!emp) return;
+
+        document.getElementById('empModalTitle').textContent = 'Chỉnh sửa thông tin nhân viên';
+        document.getElementById('emp-id').value = emp.id;
+        document.getElementById('emp-name').value = emp.name;
+        document.getElementById('emp-role').value = emp.role;
+        document.getElementById('emp-dept').value = emp.dept;
+        document.getElementById('emp-phone').value = emp.phone;
+
+        empModalInstance.show();
+    }
+
+    // Lưu dữ liệu (Thêm hoặc Cập nhật)
+    function saveEmployee() {
+        const id = document.getElementById('emp-id').value;
+        const name = document.getElementById('emp-name').value.trim();
+        const role = document.getElementById('emp-role').value.trim();
+        const dept = document.getElementById('emp-dept').value;
+        const phone = document.getElementById('emp-phone').value.trim();
+
+        if (!name || !role) {
+            alert('Vui lòng điền đầy đủ Họ và Tên và Chức vụ!');
+            return;
+        }
+
+        if (id) {
+            // Sửa thông tin
+            const index = employees.findIndex(e => e.id == id);
+            if (index !== -1) {
+                employees[index] = { id: Number(id), name, role, dept, phone };
+            }
+        } else {
+            // Thêm nhân viên mới
+            const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1;
+            employees.push({ id: newId, name, role, dept, phone });
+        }
+
+        filterEmployees();
+        empModalInstance.hide();
+    }
+
+    // Xóa nhân viên
+    function deleteEmployee(id) {
+        if (confirm('Bạn có chắc chắn muốn xóa nhân viên này khỏi hệ thống?')) {
+            employees = employees.filter(e => e.id !== id);
+            filterEmployees();
+        }
+    }
 </script>
 </body>
 </html>
