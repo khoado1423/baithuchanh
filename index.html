@@ -22,6 +22,7 @@
         .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         .bg-icon-primary { background-color: #e8f0fe; color: #1d61e7; }
         .bg-icon-warning { background-color: #fef7e0; color: #b06000; }
+        .bg-icon-purple { background-color: #f3e8fd; color: #7a0bc0; }
         .tab-content-page { display: none; }
         .tab-content-page.active { display: block; }
     </style>
@@ -90,6 +91,17 @@
                                     <div class="fs-3 fw-bold" id="dash-task-count">0</div>
                                 </div>
                                 <div class="stat-icon bg-icon-warning"><i class="fa-solid fa-tasks"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card p-3 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small">Lượt phân công</div>
+                                    <div class="fs-3 fw-bold" id="dash-assign-count">0</div>
+                                </div>
+                                <div class="stat-icon bg-icon-purple"><i class="fa-solid fa-clipboard-check"></i></div>
                             </div>
                         </div>
                     </div>
@@ -170,9 +182,43 @@
                 </div>
             </div>
 
+            <!-- TAB 4: PHÂN CÔNG CÔNG VIỆC -->
+            <div class="tab-content-page" id="tab-assignment">
+                <div class="card border-0 shadow-sm p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div class="d-flex gap-2">
+                            <select id="filter-assign-status" class="form-select form-select-sm" onchange="filterAssignments()" style="width: 180px;">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Chưa bắt đầu">Chưa bắt đầu</option>
+                                <option value="Đang thực hiện">Đang thực hiện</option>
+                                <option value="Hoàn thành">Hoàn thành</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openAssignModal()"><i class="fa-solid fa-calendar-plus me-1"></i> Tạo phân công mới</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nhân viên thực hiện</th>
+                                    <th>Tên Công việc</th>
+                                    <th>Hạn hoàn thành (Deadline)</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-center">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assign-table-body">
+                                <tr><td colspan="6" class="text-center text-muted py-3">Đang tải danh sách phân công...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Giữ khung các tab còn lại -->
-            <div class="tab-content-page" id="tab-assignment"><div class="card p-3"><h5>Tab Phân công (Bước tiếp theo)</h5></div></div>
-            <div class="tab-content-page" id="tab-schedule"><div class="card p-3"><h5>Tab Lịch tuần</h5></div></div>
+            <div class="tab-content-page" id="tab-schedule"><div class="card p-3"><h5>Tab Lịch tuần (Bước tiếp theo)</h5></div></div>
             <div class="tab-content-page" id="tab-reports"><div class="card p-3"><h5>Tab Báo cáo</h5></div></div>
             <div class="tab-content-page" id="tab-settings"><div class="card p-3"><h5>Tab Cài đặt</h5></div></div>
 
@@ -239,7 +285,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Mô tả chi tiết</label>
-                        <textarea class="form-control" id="task-desc" rows="3" placeholder="Mô tả nội dung công việc..."></textarea>
+                        <textarea class="form-control" id="task-desc" rows="3"></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -260,6 +306,51 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
                 <button type="button" class="btn btn-primary btn-sm" onclick="saveTask()">Lưu Công việc</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Phân Công Công Việc -->
+<div class="modal fade" id="assignModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignModalTitle">Tạo phân công mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignForm">
+                    <input type="hidden" id="assign-doc-id">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Chọn Nhân viên</label>
+                        <select class="form-select" id="assign-emp-select" required>
+                            <!-- Tự động load từ Firebase -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Chọn Công việc</label>
+                        <select class="form-select" id="assign-task-select" required>
+                            <!-- Tự động load từ Firebase -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Hạn hoàn thành (Deadline)</label>
+                        <input type="date" class="form-control" id="assign-deadline" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Trạng thái</label>
+                        <select class="form-select" id="assign-status" required>
+                            <option value="Chưa bắt đầu">Chưa bắt đầu</option>
+                            <option value="Đang thực hiện">Đang thực hiện</option>
+                            <option value="Hoàn thành">Hoàn thành</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="saveAssignment()">Lưu Phân công</button>
             </div>
         </div>
     </div>
@@ -288,14 +379,17 @@
     const db = getFirestore(app);
     const empCollection = collection(db, "employees");
     const taskCollection = collection(db, "tasks");
+    const assignCollection = collection(db, "assignments");
 
     let globalEmployees = [];
     let globalTasks = [];
-    let empModalInstance, taskModalInstance;
+    let globalAssignments = [];
+    let empModalInstance, taskModalInstance, assignModalInstance;
 
     window.addEventListener('DOMContentLoaded', () => {
         empModalInstance = new bootstrap.Modal(document.getElementById('empModal'));
         taskModalInstance = new bootstrap.Modal(document.getElementById('taskModal'));
+        assignModalInstance = new bootstrap.Modal(document.getElementById('assignModal'));
         setupNavigation();
         
         // 🔄 Realtime Nhân viên
@@ -314,6 +408,15 @@
                 globalTasks.push({ docId: docSnap.id, ...docSnap.data() });
             });
             filterTasks();
+        });
+
+        // 🔄 Realtime Phân công
+        onSnapshot(assignCollection, (snapshot) => {
+            globalAssignments = [];
+            snapshot.forEach((docSnap) => {
+                globalAssignments.push({ docId: docSnap.id, ...docSnap.data() });
+            });
+            filterAssignments();
         });
     });
 
@@ -351,12 +454,10 @@
     window.renderEmployees = function(dataList) {
         const tbody = document.getElementById('employee-table-body');
         tbody.innerHTML = '';
-
         if (dataList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">Không tìm thấy nhân viên nào</td></tr>`;
             return;
         }
-
         dataList.forEach((emp, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -373,20 +474,17 @@
             `;
             tbody.appendChild(tr);
         });
-
         document.getElementById('dash-emp-count').textContent = globalEmployees.length;
     };
 
     window.filterEmployees = function() {
         const searchValue = document.getElementById('search-emp').value.toLowerCase();
         const deptValue = document.getElementById('filter-dept').value;
-
         const filtered = globalEmployees.filter(emp => {
             const matchNameOrPhone = (emp.name && emp.name.toLowerCase().includes(searchValue)) || (emp.phone && emp.phone.includes(searchValue));
             const matchDept = deptValue === '' || emp.dept === deptValue;
             return matchNameOrPhone && matchDept;
         });
-
         window.renderEmployees(filtered);
     };
 
@@ -400,14 +498,12 @@
     window.editEmployee = function(docId) {
         const emp = globalEmployees.find(e => e.docId === docId);
         if (!emp) return;
-
         document.getElementById('empModalTitle').textContent = 'Sửa thông tin nhân viên';
         document.getElementById('emp-doc-id').value = emp.docId;
         document.getElementById('emp-name').value = emp.name;
         document.getElementById('emp-role').value = emp.role;
         document.getElementById('emp-dept').value = emp.dept;
         document.getElementById('emp-phone').value = emp.phone;
-
         empModalInstance.show();
     };
 
@@ -417,10 +513,8 @@
         const role = document.getElementById('emp-role').value.trim();
         const dept = document.getElementById('emp-dept').value;
         const phone = document.getElementById('emp-phone').value.trim();
-
         if (!name || !role) { alert('Vui lòng điền đủ thông tin!'); return; }
         const data = { name, role, dept, phone };
-
         try {
             if (docId) await updateDoc(doc(db, "employees", docId), data);
             else await addDoc(empCollection, data);
@@ -439,12 +533,10 @@
     window.renderTasks = function(dataList) {
         const tbody = document.getElementById('task-table-body');
         tbody.innerHTML = '';
-
         if (dataList.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">Chưa có công việc nào</td></tr>`;
             return;
         }
-
         dataList.forEach((task, index) => {
             let priorityBadge = 'bg-secondary';
             if (task.priority === 'Cao') priorityBadge = 'bg-danger';
@@ -465,20 +557,17 @@
             `;
             tbody.appendChild(tr);
         });
-
         document.getElementById('dash-task-count').textContent = globalTasks.length;
     };
 
     window.filterTasks = function() {
         const searchValue = document.getElementById('search-task').value.toLowerCase();
         const priorityValue = document.getElementById('filter-task-priority').value;
-
         const filtered = globalTasks.filter(task => {
             const matchName = task.name && task.name.toLowerCase().includes(searchValue);
             const matchPriority = priorityValue === '' || task.priority === priorityValue;
             return matchName && matchPriority;
         });
-
         window.renderTasks(filtered);
     };
 
@@ -492,14 +581,12 @@
     window.editTask = function(docId) {
         const task = globalTasks.find(t => t.docId === docId);
         if (!task) return;
-
         document.getElementById('taskModalTitle').textContent = 'Chỉnh sửa công việc';
         document.getElementById('task-doc-id').value = task.docId;
         document.getElementById('task-name').value = task.name;
         document.getElementById('task-desc').value = task.desc || '';
         document.getElementById('task-priority').value = task.priority;
         document.getElementById('task-duration').value = task.duration;
-
         taskModalInstance.show();
     };
 
@@ -509,10 +596,8 @@
         const desc = document.getElementById('task-desc').value.trim();
         const priority = document.getElementById('task-priority').value;
         const duration = Number(document.getElementById('task-duration').value);
-
         if (!name) { alert('Vui lòng nhập tên công việc!'); return; }
         const data = { name, desc, priority, duration };
-
         try {
             if (docId) await updateDoc(doc(db, "tasks", docId), data);
             else await addDoc(taskCollection, data);
@@ -523,6 +608,101 @@
     window.deleteTask = async function(docId) {
         if (confirm('Xóa công việc này khỏi danh mục?')) {
             try { await deleteDoc(doc(db, "tasks", docId)); } 
+            catch (error) { alert("Lỗi: " + error.message); }
+        }
+    };
+
+    // ==================== PHÂN CÔNG LOGIC ====================
+    window.renderAssignments = function(dataList) {
+        const tbody = document.getElementById('assign-table-body');
+        tbody.innerHTML = '';
+        if (dataList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">Chưa có phân công nào</td></tr>`;
+            return;
+        }
+
+        dataList.forEach((assign, index) => {
+            let statusBadge = 'bg-secondary';
+            if (assign.status === 'Chưa bắt đầu') statusBadge = 'bg-warning text-dark';
+            if (assign.status === 'Đang thực hiện') statusBadge = 'bg-primary';
+            if (assign.status === 'Hoàn thành') statusBadge = 'bg-success';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td class="fw-bold text-primary">${assign.empName}</td>
+                <td class="fw-bold">${assign.taskName}</td>
+                <td><i class="fa-regular fa-calendar-check me-1 text-muted"></i>${assign.deadline || '-'}</td>
+                <td><span class="badge ${statusBadge}">${assign.status}</span></td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editAssignment('${assign.docId}')"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAssignment('${assign.docId}')"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('dash-assign-count').textContent = globalAssignments.length;
+    };
+
+    window.filterAssignments = function() {
+        const statusValue = document.getElementById('filter-assign-status').value;
+        const filtered = globalAssignments.filter(assign => statusValue === '' || assign.status === statusValue);
+        window.renderAssignments(filtered);
+    };
+
+    window.openAssignModal = function() {
+        if (globalEmployees.length === 0 || globalTasks.length === 0) {
+            alert('Bạn cần tạo ít nhất 1 Nhân viên và 1 Công việc trước khi tiến hành Phân công!');
+            return;
+        }
+
+        // Tự động đổ danh sách Nhân viên vào Select
+        const empSelect = document.getElementById('assign-emp-select');
+        empSelect.innerHTML = globalEmployees.map(e => `<option value="${e.name}">${e.name} (${e.dept})</option>`).join('');
+
+        // Tự động đổ danh sách Công việc vào Select
+        const taskSelect = document.getElementById('assign-task-select');
+        taskSelect.innerHTML = globalTasks.map(t => `<option value="${t.name}">${t.name} [Ưu tiên: ${t.priority}]</option>`).join('');
+
+        document.getElementById('assignModalTitle').textContent = 'Tạo phân công mới';
+        document.getElementById('assignForm').reset();
+        document.getElementById('assign-doc-id').value = '';
+        assignModalInstance.show();
+    };
+
+    window.editAssignment = function(docId) {
+        const assign = globalAssignments.find(a => a.docId === docId);
+        if (!assign) return;
+
+        window.openAssignModal();
+        document.getElementById('assignModalTitle').textContent = 'Chỉnh sửa phân công';
+        document.getElementById('assign-doc-id').value = assign.docId;
+        document.getElementById('assign-emp-select').value = assign.empName;
+        document.getElementById('assign-task-select').value = assign.taskName;
+        document.getElementById('assign-deadline').value = assign.deadline;
+        document.getElementById('assign-status').value = assign.status;
+    };
+
+    window.saveAssignment = async function() {
+        const docId = document.getElementById('assign-doc-id').value;
+        const empName = document.getElementById('assign-emp-select').value;
+        const taskName = document.getElementById('assign-task-select').value;
+        const deadline = document.getElementById('assign-deadline').value;
+        const status = document.getElementById('assign-status').value;
+
+        if (!deadline) { alert('Vui lòng chọn hạn hoàn thành (Deadline)!'); return; }
+        const data = { empName, taskName, deadline, status };
+
+        try {
+            if (docId) await updateDoc(doc(db, "assignments", docId), data);
+            else await addDoc(assignCollection, data);
+            assignModalInstance.hide();
+        } catch (error) { alert("Lỗi: " + error.message); }
+    };
+
+    window.deleteAssignment = async function(docId) {
+        if (confirm('Xóa lượt phân công này?')) {
+            try { await deleteDoc(doc(db, "assignments", docId)); } 
             catch (error) { alert("Lỗi: " + error.message); }
         }
     };
